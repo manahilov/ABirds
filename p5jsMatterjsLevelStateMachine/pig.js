@@ -9,6 +9,10 @@ class Pig {
      * @param {Object} world - The current world.
      */
     constructor(x, y, r, world) {
+        this.x = x;
+        this.y = y;
+        this.r = r;
+        this.world = world;
         var options = {
             friction: 0.001,
             restitution: 0.6,
@@ -19,12 +23,21 @@ class Pig {
             }
         };
 
-        this.body = Bodies.circle(x, y, r, options);
-        this.x = x;
-        this.y = y;
-        this.r = r;
-        this.world = world
 
+        this.pigspr = createSprite(60, 60, 0, 0);
+        var pigidleAnim = this.pigspr.addAnimation("pigidle", "images/animation/pig01.png", "images/animation/pig02.png");
+        pigidleAnim.offX = -60;
+        pigidleAnim.offY = -60;
+        pigidleAnim.frameDelay = 36;
+
+        var pigdeadAnim = this.pigspr.addAnimation("pigdead", "images/animation/smoke01.png", "images/animation/smoke02.png", "images/animation/smoke03.png");
+        pigdeadAnim.offX = -60;
+        pigdeadAnim.offY = -60;
+        pigdeadAnim.frameDelay = 28;
+        pigdeadAnim.looping = false;
+        this.pigspr.changeAnimation("pigidle");
+
+        this.body = Bodies.circle(x, y, r, options);
         World.add(this.world, this.body);
     }
 
@@ -46,11 +59,12 @@ class Pig {
         translate(pos.x, pos.y);
         rotate(angle);
         rectMode(CENTER);
-        strokeWeight(1);
-        stroke(255);
-        fill(144, 0, 144);
-        ellipse(0, 0, this.r * 2);
-        line(0, 0, this.r, 0);
+        drawSprite(this.pigspr);
+        // strokeWeight(1);
+        // stroke(255);
+        // fill(144, 0, 144);
+        // ellipse(0, 0, this.r * 2);
+        // line(0, 0, this.r, 0);
         pop();
     }
 }

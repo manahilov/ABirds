@@ -22,6 +22,17 @@ class Bird {
             }
         };
 
+        this.birdspr = createSprite(60, 60, 0, 0);
+        var idleAnim = this.birdspr.addAnimation("idle", "images/animation/bird01.png", "images/animation/bird02.png");
+        idleAnim.offX = -60;
+        idleAnim.offY = -60;
+        idleAnim.frameDelay = 32;
+
+        var deadAnim = this.birdspr.addAnimation("dead", "images/animation/smoke01.png", "images/animation/smoke02.png", "images/animation/smoke03.png");
+        deadAnim.offX = -60;
+        deadAnim.offY = -60;
+        deadAnim.frameDelay = 28;
+        this.birdspr.changeAnimation("idle");
         this.body = Bodies.circle(x, y, r, options);
         World.add(this.world, this.body);
     }
@@ -44,11 +55,13 @@ class Bird {
         translate(pos.x, pos.y);
         rotate(angle);
         rectMode(CENTER);
-        strokeWeight(1);
-        stroke(255);
-        fill(127);
-        ellipse(0, 0, this.r * 2);
-        line(0, 0, this.r, 0);
+
+        drawSprite(this.birdspr);
+        /* strokeWeight(1);
+         stroke(255);
+         fill(127);
+         ellipse(0, 0, this.r * 2);
+         line(0, 0, this.r, 0);*/
         pop();
     }
 }

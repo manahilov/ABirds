@@ -19,18 +19,35 @@ var boundaryCategory = 0x0001,
 
 var canvas;
 
-const LEVEL_0 = 0,
-    LEVEL_1 = 1,
-    END_GAME = 2;
+const START_GAME = 0,
+    LEVEL_0 = 1,
+    LEVEL_1 = 2,
+    END_GAME = 3;
 var gameState = 0;
 var levelCompleted = false;
-var level0, level1;
+var startmenu, level0, level1;
 var level0data, level1data;
+
+var lvl1bgn, lvl2bgn;
+
+var bgnMusicSFX, birdflySFX, lvlCompleteSFX, lvlFailedSFX, lvlStartSFX, lvlVictorySFX, pigColSFX, slingSFX, endSFX;
 
 /**
  * Load the object configurations from JSON files.
  */
 function preload() {
+    bgnMusicSFX = loadSound("sfx/theme.ogg");
+    birdflySFX = loadSound("sfx/birdfly.wav");
+    lvlCompleteSFX = loadSound("sfx/levelcompleted.wav");
+    lvlFailedSFX = loadSound("sfx/levelfailed.wav");
+    lvlStartSFX = loadSound("sfx/levelstart.wav");
+    lvlVictorySFX = loadSound("sfx/levelvictory.wav");
+    pigColSFX = loadSound("sfx/pigcollision.wav");
+    slingSFX = loadSound("sfx/slingshotstr.wav");
+    endSFX = loadSound("sfx/final.mp3");
+
+    lvl1bgn = loadImage("images/Farm.png");
+    lvl2bgn = loadImage("images/Space.png");
     level0data = loadJSON("level0.json");
     level1data = loadJSON("level1.json");
 }
@@ -39,6 +56,8 @@ function preload() {
  * Creates the canvas, engine, world and loads the first level.
  */
 function setup() {
+    setupMusic();
+    bgnMusicSFX.loop();
     canvas = createCanvas(1280, 720);
     frameRate(60);
     engine = Engine.create({
@@ -46,6 +65,7 @@ function setup() {
         velocityIterations: 10
     });
     world = engine.world;
+    startmenu = new Menu(canvas);
     level0 = new Level(canvas, level0data);
 }
 
@@ -54,29 +74,35 @@ function setup() {
  */
 function draw() {
 
-    background(144);
     Engine.update(engine);
     switch (gameState) {
+        case START_GAME:
+            startmenu.draw();
+            break;
         case LEVEL_0:
+            background(lvl1bgn);
             level0.draw();
             if (levelCompleted) {
                 level0 = null;
                 level1 = new Level(canvas, level1data);
                 gameState = LEVEL_1;
                 levelCompleted = false;
+                lvlStartSFX.play();
             }
             break;
         case LEVEL_1:
+            background(lvl2bgn);
             level1.draw();
             if (levelCompleted) {
                 level1 = null;
                 gameState = END_GAME;
+                endSFX.play();
             }
             break;
         case END_GAME:
             textSize(42);
+            fill(255);
             text('Game Over!', (width / 2) - 50, height / 2);
-            fill(0, 102, 153);
             break;
 
     }
@@ -86,10 +112,29 @@ function draw() {
  * Calls the corresponding mouseRelease functions for the current level.
  */
 function mouseReleased() {
+    if (gameState == START_GAME) {
+        startmenu.mouseReleased();
+    }
     if (gameState == LEVEL_0) {
         level0.mouseReleased();
     }
     if (gameState == LEVEL_1) {
         level1.mouseReleased();
     }
+}
+
+function setupMusic() {
+    bgnMusicSFX.setVolume(0.3);
+    birdflySFX.setVolume(0.3);
+    lvlCompleteSFX.setVolume(0.3);
+    lvlFailedSFX.setVolume(0.3);
+    lvlStartSFX.setVolume(0.3);
+    lvlVictorySFX.setVolume(0.3);
+    pigColSFX.setVolume(0.3);
+    slingSFX.setVolume(0.3);
+    endSFX.setVolume(0.3);
+}
+
+function changeLevel(level) {
+    gameState = level;
 }

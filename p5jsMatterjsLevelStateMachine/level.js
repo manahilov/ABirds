@@ -22,6 +22,9 @@ class Level {
         this.mConstraint;
         this.constraint;
 
+        this.slingA = loadImage("images/SlingA.png");
+        this.slingB = loadImage("images/SlingB.png");
+
         this.enableInput = false;
 
         this.constructWorld(this.canvas);
@@ -60,10 +63,11 @@ class Level {
         if (this.isEverythingSleeping() && this.birds.length > 1 && this.isBirdFlying) {
             this.isBirdFlying = false;
             this.nextBird = true;
+            this.birds[this.currentBird].birdspr.changeAnimation("dead");
             this.loadNextBird();
         } else if (this.isEverythingSleeping() && this.birds.length == 1 && this.isBirdFlying) {
             this.birds.splice(this.currentBird, 1);
-            this.clearEngine();
+            clearEngine();
             levelCompleted = true;
         }
     }
@@ -75,6 +79,8 @@ class Level {
     constructWorld(canvas) {
         this.boundaries.push(new Boundary(640, 700, width, 10, 0, false, boundaryCategory, world));
         this.boundaries.push(new Boundary(1270, 360, 10, 720, 0, false, boundaryCategory, world));
+        this.boundaries.push(new Boundary(0, 360, 10, 720, 0, false, boundaryCategory, world));
+        this.boundaries.push(new Boundary(640, 0, width, 10, 0, false, boundaryCategory, world));
 
 
         var pigsData = this.configdata.pigs;
@@ -126,6 +132,7 @@ class Level {
     releaseBird() {
         var distance = dist(this.slingshotcenter.body.position.x, this.slingshotcenter.body.position.y, this.birds[this.currentBird].body.position.x, this.birds[this.currentBird].body.position.y);
         if (distance < 30) {
+            birdflySFX.play();
             this.isBirdFlying = true;
             this.constraint.bodyB = null;
             this.mouseButtonUp = false;
@@ -155,11 +162,26 @@ class Level {
      */
     drawObjects() {
         //Drawing and checking for sleep in the circles
+        image(this.slingB, 300, 450, 45, 200);
+
         for (var i = 0; i < this.birds.length; i++) {
             this.birds[i].show();
-            //Draws a line between the sling center and the current body
-            line(this.slingshotcenter.body.position.x, this.slingshotcenter.body.position.y, this.birds[this.currentBird].body.position.x, this.birds[this.currentBird].body.position.y);
+
+            if (!this.isBirdFlying) {
+                push();
+                strokeWeight(10);
+                stroke(78, 46, 40);
+                line(this.slingshotcenter.body.position.x + 30, this.slingshotcenter.body.position.y + 30, this.birds[this.currentBird].body.position.x - 15, this.birds[this.currentBird].body.position.y);
+                //Draws a line between the sling center and the current body
+                line(this.slingshotcenter.body.position.x - 20, this.slingshotcenter.body.position.y + 30, this.birds[this.currentBird].body.position.x - 15, this.birds[this.currentBird].body.position.y);
+                pop();
+
+            }
+            //centerline
+            //line(this.slingshotcenter.body.position.x, this.slingshotcenter.body.position.y, this.birds[this.currentBird].body.position.x, this.birds[this.currentBird].body.position.y);
         }
+        image(this.slingA, 265, 455, 50, 110);
+
 
         for (var i = 0; i < this.boundaries.length; i++) {
             this.boundaries[i].show();
@@ -167,13 +189,19 @@ class Level {
 
         for (var i = 0; i < this.pigs.length; i++) {
             this.pigs[i].show();
-            if (this.pigs[i].body.label == "pigDead") {
+            if (this.pigs[i].body.label == "pigIsDying") {
+                this.pigs[i].body.label = "pigDead";
                 this.pigs[i].removeFromWorld();
+                //this.pigs[i].body.isSensor = true;
+                // this.pigs[i].body.isStatic = true;
+                this.pigs[i].pigspr.changeAnimation("pigdead");
+                setTimeout(this.removePig, 2000, this.pigs, this.pigs[i], i);
+                /*this.pigs[i].removeFromWorld();
                 this.pigs.splice(i, 1);
                 if (this.pigs.length == 0) {
                     this.clearEngine();
                     levelCompleted = true;
-                }
+                }*/
             }
         }
 
@@ -183,6 +211,9 @@ class Level {
 
         if (this.mConstraint.body) {
             if (this.mConstraint.body.label == "bird") {
+                if (this.wasBirdDragged == false) {
+                    slingSFX.play();
+                }
                 this.wasBirdDragged = true;
             }
             var pos = this.mConstraint.body.position;
@@ -191,6 +222,18 @@ class Level {
 
             stroke(0, 255, 0);
             line(pos.x + offset.x, pos.y + offset.y, m.x, m.y);
+        }
+    }
+
+    removePig(pigsarr, pig, index) {
+        pig.body.isSensor = true;
+        pig.body.isStatic = true;
+        pig.pigspr.visible = false;
+        //pig.removeFromWorld();
+        pigsarr.splice(index, 1);
+        if (pigsarr.length == 0) {
+            clearEngine();
+            levelCompleted = true;
         }
     }
 
@@ -219,8 +262,9 @@ class Level {
                     if (pair.bodyA.label == "pig" || pair.bodyB.label == "pig") {
                         var relativeMomentum = Vector.sub(pair.bodyA.velocity, pair.bodyB.velocity);
                         if (Vector.magnitude(relativeMomentum) > 7) {
-                            pair.bodyA.label = pair.bodyA.label == "pig" ? "pigDead" : pair.bodyA.label;
-                            pair.bodyB.label = pair.bodyB.label == "pig" ? "pigDead" : pair.bodyB.label;
+                            pigColSFX.play();
+                            pair.bodyA.label = pair.bodyA.label == "pig" ? "pigIsDying" : pair.bodyA.label;
+                            pair.bodyB.label = pair.bodyB.label == "pig" ? "pigIsDying" : pair.bodyB.label;
                         }
                     }
                 } else {
@@ -234,8 +278,9 @@ class Level {
                                 threshold = 13;
                             }
                             if (Vector.magnitude(relativeMomentum) > threshold) {
-                                pair.bodyA.label = pair.bodyA.label == "pig" ? "pigDead" : pair.bodyA.label;
-                                pair.bodyB.label = pair.bodyB.label == "pig" ? "pigDead" : pair.bodyB.label;
+                                pigColSFX.play();
+                                pair.bodyA.label = pair.bodyA.label == "pig" ? "pigIsDying" : pair.bodyA.label;
+                                pair.bodyB.label = pair.bodyB.label == "pig" ? "pigIsDying" : pair.bodyB.label;
                             }
                         }
                     }
@@ -244,11 +289,12 @@ class Level {
         });
     }
 
-    /**
-     * Prepares the world and the engine for the next level by clearing them.
-     */
-    clearEngine() {
-        World.clear(engine.world);
-        Engine.clear(engine);
-    }
+
+}
+/**
+ * Prepares the world and the engine for the next level by clearing them.
+ */
+function clearEngine() {
+    World.clear(engine.world);
+    Engine.clear(engine);
 }
