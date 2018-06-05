@@ -6,7 +6,7 @@ class Menu {
      */
     constructor(canvas) {
         this.homePage = loadImage("images/home_menu.png");
-        this.buttonPlay = loadImage("images/PlayButton.png");
+        this.buttonPlay = loadImage("images/PlayButtonHiRes.png");
         this.buttonExit = loadImage("images/ExitButton.png");
 
         this.playXpos = width - 300;

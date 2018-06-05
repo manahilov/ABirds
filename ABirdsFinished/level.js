@@ -240,7 +240,9 @@ class Level {
             this.boundaries[i].show();
         }
 
-        for (var i = 0; i < this.pigs.length; i++) {
+        //for (var i = 0; i < this.pigs.length; i++) {
+        for (var i = this.pigs.length - 1; i >= 0; i--) {
+
             this.pigs[i].show();
             if (this.pigs[i].body.label == "pigIsDying") {
                 this.pigs[i].body.label = "pigDead";
@@ -253,6 +255,9 @@ class Level {
                     this.stageCompleted = true;
                 }
                 setTimeout(this.removePig, 2000, this.pigs, this.pigs[i], i);
+            }
+            if (this.pigs[i].isPigDead == true) {
+                this.pigs.splice(i, 1);
             }
         }
 
@@ -290,7 +295,8 @@ class Level {
         pig.body.isSensor = true;
         pig.body.isStatic = true;
         pig.pigspr.visible = false;
-        pigsarr.splice(index, 1);
+        pig.isPigDead = true;
+        //pigsarr.splice(index, 1);
     }
 
     /**

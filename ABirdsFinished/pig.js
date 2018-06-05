@@ -41,6 +41,7 @@ class Pig {
 
         this.body = Bodies.circle(x, y, r, options);
         World.add(this.world, this.body);
+        this.isPigDead = false;
     }
 
     /**
