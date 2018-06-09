@@ -14,5 +14,7 @@ Abirds is a copy of the famous game Angry Birds. The goal of the game is to elim
 ## Level 3
 ![site](https://user-images.githubusercontent.com/15209098/41192952-c7bc2722-6c0e-11e8-836e-c2c8edbe6124.png)
 
-<p align="center"> <img src="https://user-images.githubusercontent.com/15209098/41192988-4dbb67a2-6c0f-11e8-9d68-5aca001fe87a.png"> Happy Gaming! <img src="https://user-images.githubusercontent.com/15209098/41192992-58c50b62-6c0f-11e8-82e9-dc8b11e5810f.png">
+## A detailed documentation can be found in /out folder
+
+<p align="center"> <img src="https://user-images.githubusercontent.com/15209098/41192988-4dbb67a2-6c0f-11e8-9d68-5aca001fe87a.png"> <b>Happy Gaming!</b> <img src="https://user-images.githubusercontent.com/15209098/41192992-58c50b62-6c0f-11e8-82e9-dc8b11e5810f.png">
 </p>
